@@ -11,11 +11,6 @@ if \
 	test $(git diff --cached --name-only --diff-filter=A -z $against |
 	  LC_ALL=C tr -d '[ -~]\0' | wc -c) != 0
 then
-	output "Error: Attempt to add a non-ascii file name."
-	output
-	output "This can cause problems if you want to work"
-	output "with people on other platforms."
-	output
-	output "To be portable the file must be renamed."
-	die ""
+	die "Non-ascii filenames are prohibited:
+$( git diff --cached --name-only --diff-filter=A $against )"
 fi
