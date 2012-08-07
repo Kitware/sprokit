@@ -9,6 +9,12 @@ output () {
 [ -d "$hookdir/$hookname.d" ] || exit 0
 
 for hook in "$hookdir/$hookname.d"/*.sh; do
+	[ -e "$hook" ] || continue
+	[ -x "$hook" ] || {
+		echo "Hook is not executable: $hook"
+		continue
+	}
+
 	source "$hook" ${1+"$@"}
 done
 
