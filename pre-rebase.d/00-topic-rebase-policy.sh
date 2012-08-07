@@ -38,7 +38,7 @@ esac
 
 # Does the topic really exist?
 git show-ref -q "$topic" || {
-	echo >&2 "No such branch $topic"
+	output "No such branch $topic"
 	exit 1
 }
 
@@ -46,7 +46,7 @@ git show-ref -q "$topic" || {
 not_in_master=`git rev-list --pretty=oneline ^master "$topic"`
 if test -z "$not_in_master"
 then
-	echo >&2 "$topic is fully merged to master; better remove it."
+	output "$topic is fully merged to master; better remove it."
 	exit 1 ;# we could allow it, but there is no point.
 fi
 
@@ -58,7 +58,7 @@ then
 	not_in_topic=`git rev-list "^$topic" master`
 	if test -z "$not_in_topic"
 	then
-		echo >&2 "$topic is already up-to-date with master"
+		output "$topic is already up-to-date with master"
 		exit 1 ;# we could allow it, but there is no point.
 	else
 		exit 0

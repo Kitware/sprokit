@@ -1,5 +1,5 @@
 # If you want to allow non-ascii filenames set this variable to true.
-allownonascii=$(git config hooks.allownonascii)
+allownonascii=$( git config hooks.allownonascii )
 
 # Cross platform projects tend to avoid non-ascii filenames; prevent
 # them from being added to the repository. We exploit the fact that the
@@ -17,6 +17,5 @@ then
 	output "with people on other platforms."
 	output
 	output "To be portable the file must be renamed."
-	output
 	die ""
 fi
