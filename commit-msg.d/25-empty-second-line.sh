@@ -1,3 +1,5 @@
+#!/bin/sh
+
 text=$( sed -e '/^#/d' -e '/^diff --git/q' "$1" )
 lines=$( echo -n "$text" | wc -l )
 line=$( echo -n "$text" | head -n 2 | tail -n 1 )

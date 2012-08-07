@@ -1,3 +1,5 @@
+#!/bin/sh
+
 . git-sh-setup
 
 head -n 1 "$1" | grep -q -e '^Merge branch .* of .*$' &&

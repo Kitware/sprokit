@@ -1,3 +1,5 @@
+#!/bin/sh
+
 . git-sh-setup
 
 "$GIT_DIR/hooks/commit-msg" ${1+"$@"} ||

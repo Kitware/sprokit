@@ -1,3 +1,5 @@
+#!/bin/sh
+
 if git rev-parse --quiet --verify HEAD >/dev/null; then
 	against=HEAD
 else

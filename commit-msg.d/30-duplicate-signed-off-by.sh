@@ -1,3 +1,5 @@
+#!/bin/sh
+
 . git-sh-setup
 
 test "" = "$( grep '^Signed-off-by: ' "$1" |

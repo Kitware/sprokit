@@ -1,3 +1,5 @@
+#!/bin/sh
+
 line=$( head -n 1 "$1" )
 len=$( echo -n "$line" | wc -c )
 

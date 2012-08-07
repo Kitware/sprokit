@@ -1,3 +1,5 @@
+#!/bin/sh
+
 . git-sh-setup
 
 sed -e '/^#/d' -e '/^diff --git/q' "$@" | grep -hn -e '[[:space:]]$' &&
