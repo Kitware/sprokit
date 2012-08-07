@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Arguments:
+#   <none>
+
+# TODO: Duplicate input
+
+hookdir="$( dirname "$0" )"
+hookname=post-receive
+
+source "$hookdir/run-hooks" "$@"

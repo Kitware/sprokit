@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Arguments:
+#   name of the ref being updated
+#   old object name stored in the ref
+#   new object name to be stored in the ref
+
+hookdir="$( dirname "$0" )"
+hookname=update
+
+source "$hookdir/run-hooks" "$@"

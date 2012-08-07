@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Arguments:
+#   command used to rewrite
+
+# TODO: Duplicate input
+
+hookdir="$( dirname "$0" )"
+hookname=post-rewrite
+
+source "$hookdir/run-hooks" "$@"

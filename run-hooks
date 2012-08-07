@@ -1,0 +1,13 @@
+#!/bin/sh
+
+. git-sh-setup
+
+output () {
+	echo "$@" 1>&2
+}
+
+for hook in "$hookdir/$hookname.d/*.sh"; do
+	source "$hook" ${1+"$@"}
+done
+
+:

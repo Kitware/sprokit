@@ -1,0 +1,1 @@
+"$GIT_DIR/hooks/pre-commit" ${1+"$@"} || die "pre-commit hook failed"

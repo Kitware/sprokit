@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Arguments:
+#   path to file with commit message
+
+hookdir="$( dirname "$0" )"
+hookname=applypatch-msg
+
+source "$hookdir/run-hooks" "$@"

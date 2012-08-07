@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Arguments:
+#   upstream forked from
+#   branch being rebased (empty if HEAD)
+
+hookdir="$( dirname "$0" )"
+hookname=pre-rebase
+
+source "$hookdir/run-hooks" "$@"

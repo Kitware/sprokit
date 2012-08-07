@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Arguments:
+#   ref of previous HEAD
+#   ref of new HEAD
+#   1 if branch checkout, 0 if file checkout
+
+hookdir="$( dirname "$0" )"
+hookname=post-checkout
+
+source "$hookdir/run-hooks" "$@"

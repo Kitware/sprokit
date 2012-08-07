@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Arguments:
+#   path to file with commit message
+#   source of the commit message
+#   commit SHA1 (if amending or using a commit as a template)
+
+hookdir="$( dirname "$0" )"
+hookname=prepare-commit-msg
+
+source "$hookdir/run-hooks" "$@"
