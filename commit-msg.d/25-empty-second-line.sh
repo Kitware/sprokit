@@ -1,3 +1,8 @@
-line=$( head -n 2 "$1" | tail -n 1 )
+text=$( sed -e '/^#/d' -e '/^diff --git/q' "$1" )
+lines=$( echo -n "$text" | wc -l )
+line=$( echo -n "$text" | head -n 2 | tail -n 1 )
 
-[ -n "$line" ] && die "The second line must be empty"
+[ "$lines" -gt 1 ] && [ -n "$line" ] &&
+	die "The second line must be empty"
+
+:
