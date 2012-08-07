@@ -1,3 +1,3 @@
-sed -e '/^#/d' "$@" | grep -hn -e '[[:space:]]$' && die "Trailing whitespace in commit message"
+sed -e '/^#/d' -e '/^diff --git/q' "$@" | grep -hn -e '[[:space:]]$' && die "Trailing whitespace in commit message"
 
 :
