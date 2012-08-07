@@ -3,12 +3,12 @@ len=$( echo -n "$line" | wc -c )
 
 is_merge () {
 	[ -f "$GIT_DIR/MERGE_MSG" ] &&
-	    echo "$line" | grep -q "^Merge "
+		echo "$line" | grep -q "^Merge "
 }
 
 is_pull_merge () {
 	is_merge &&
-	    echo "$line" | grep -q "^Merge branch .* of .*$"
+		echo "$line" | grep -q "^Merge branch .* of .*$"
 }
 
 is_revert () {
@@ -26,6 +26,8 @@ is_punctuated () {
 is_conjunction () {
 	echo "$line" | grep -q ' and '
 }
+
+. git-sh-setup
 
 if [ $len -lt 8 ]; then
 	die "First line is too short:

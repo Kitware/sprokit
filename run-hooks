@@ -1,21 +1,16 @@
 #!/bin/sh
 
-. git-sh-setup
-
-output () {
-	echo "$@" 1>&2
-}
-
 [ -d "$hookdir/$hookname.d" ] || exit 0
 
-for hook in "$hookdir/$hookname.d"/*.sh; do
+for hook in "$hookdir/$hookname.d"/*; do
 	[ -e "$hook" ] || continue
+	echo -n "$hook" | grep -q -e '\.disabled$' && continue
 	[ -x "$hook" ] || {
 		echo "Hook is not executable: $hook"
 		continue
 	}
 
-	source "$hook" ${1+"$@"} || exit $?
+	"$hook" ${1+"$@"} || exit $?
 done
 
 :

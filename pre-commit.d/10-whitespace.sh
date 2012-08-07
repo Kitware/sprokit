@@ -15,6 +15,15 @@
 # limitations under the License.
 #=============================================================================
 
+if git rev-parse --quiet --verify HEAD >/dev/null; then
+	against=HEAD
+else
+	# Initial commit: diff against an empty tree object
+	against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+fi
+
+. git-sh-setup
+
 bad=$( git diff-index --check --cached $against -- ) || die "$bad"
 
 # Approximate whitespace=tab-in-indent check with Git < 1.7.2.

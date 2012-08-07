@@ -15,6 +15,8 @@
 # merged to 'next' branch from getting rebased, because allowing it
 # would result in rebasing already published history.
 
+. git-sh-setup
+
 publish=next
 basebranch="$1"
 if test "$#" = 2
