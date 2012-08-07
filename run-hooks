@@ -6,7 +6,7 @@ output () {
 	echo "$@" 1>&2
 }
 
-for hook in "$hookdir/$hookname.d/*.sh"; do
+for hook in "$hookdir/$hookname.d"/*.sh; do
 	source "$hook" ${1+"$@"}
 done
 
