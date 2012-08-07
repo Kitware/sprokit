@@ -15,7 +15,7 @@ for hook in "$hookdir/$hookname.d"/*.sh; do
 		continue
 	}
 
-	source "$hook" ${1+"$@"}
+	source "$hook" ${1+"$@"} || exit $?
 done
 
 :
