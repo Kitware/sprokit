@@ -1,12 +1,14 @@
 #!/bin/sh
 
+. git-sh-setup
+
 [ -d "$hookdir/$hookname.d" ] || exit 0
 
 for hook in "$hookdir/$hookname.d"/*; do
 	[ -e "$hook" ] || continue
 	echo -n "$hook" | grep -q -e '\.disabled$' && continue
 	[ -x "$hook" ] || {
-		echo "Hook is not executable: $hook"
+		say "Hook is not executable: $hook"
 		continue
 	}
 
