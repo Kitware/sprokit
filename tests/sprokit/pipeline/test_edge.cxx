@@ -411,6 +411,7 @@ typedef time_clock_t::duration duration_t;
 
 static void push_datum(sprokit::edge_t edge, sprokit::edge_datum_t edat);
 
+TEST_PROPERTY(TIMEOUT, 5)
 IMPLEMENT_TEST(capacity)
 {
   sprokit::config_t const config = sprokit::config::empty_config();
@@ -464,6 +465,75 @@ IMPLEMENT_TEST(capacity)
 }
 
 static void check_time(duration_t const& actual, duration_t const& expected, char const* const message);
+
+TEST_PROPERTY(TIMEOUT, 5)
+IMPLEMENT_TEST(try_push_datum)
+{
+  sprokit::config_t const config = sprokit::config::empty_config();
+
+  sprokit::config::value_t const value_capacity = boost::lexical_cast<sprokit::config::value_t>(1);
+
+  config->set_value(sprokit::edge::config_capacity, value_capacity);
+
+  sprokit::edge_t const edge = boost::make_shared<sprokit::edge>(config);
+
+  sprokit::stamp::increment_t const inc = sprokit::stamp::increment_t(1);
+
+  sprokit::datum_t const dat1 = sprokit::datum::empty_datum();
+  sprokit::datum_t const dat2 = sprokit::datum::complete_datum();
+  sprokit::stamp_t const stamp1 = sprokit::stamp::new_stamp(inc);
+  sprokit::stamp_t const stamp2 = sprokit::stamp::incremented_stamp(stamp1);
+
+  sprokit::edge_datum_t const edat1 = sprokit::edge_datum_t(dat1, stamp1);
+  sprokit::edge_datum_t const edat2 = sprokit::edge_datum_t(dat2, stamp2);
+
+  // Fill the edge.
+  edge->push_datum(edat1);
+
+  time_point_t const start = time_clock_t::now();
+
+  // This should be blocking.
+  bool const pushed = edge->try_push_datum(edat2, WAIT_DURATION);
+
+  time_point_t const end = time_clock_t::now();
+
+  if (pushed)
+  {
+    TEST_ERROR("Returned true when a push should have timed out");
+  }
+
+  duration_t const duration = end - start;
+
+  check_time(duration, WAIT_DURATION, "trying to get a datum from an edge");
+
+  // Make sure the edge still is at capacity.
+  if (edge->datum_count() != 1)
+  {
+    TEST_ERROR("A datum was pushed into a full edge");
+  }
+}
+
+TEST_PROPERTY(TIMEOUT, 5)
+IMPLEMENT_TEST(try_get_datum)
+{
+  sprokit::edge_t const edge = boost::make_shared<sprokit::edge>();
+
+  time_point_t const start = time_clock_t::now();
+
+  // This should be blocking.
+  boost::optional<sprokit::edge_datum_t> const opt_datum = edge->try_get_datum(WAIT_DURATION);
+
+  time_point_t const end = time_clock_t::now();
+
+  if (opt_datum)
+  {
+    TEST_ERROR("Returned a datum from an empty edge");
+  }
+
+  duration_t const duration = end - start;
+
+  check_time(duration, WAIT_DURATION, "trying to get a datum from an edge");
+}
 
 void
 push_datum(sprokit::edge_t edge, sprokit::edge_datum_t edat)
