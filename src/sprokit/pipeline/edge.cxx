@@ -37,6 +37,8 @@
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <boost/weak_ptr.hpp>
 
 #include <deque>
@@ -88,9 +90,11 @@ class edge::priv
 
     typedef boost::weak_ptr<process> process_ref_t;
 
-    bool has_data() const;
     bool full_of_data() const;
     void complete_check() const;
+
+    bool push(edge_datum_t const& datum, boost::optional<duration_t> const& duration = boost::none);
+    boost::optional<edge_datum_t> pop(boost::optional<duration_t> const& duration = boost::none);
 
     bool const depends;
     size_t const capacity;
@@ -151,7 +155,7 @@ edge
 
   (void)lock;
 
-  return d->has_data();
+  return !d->q.empty();
 }
 
 bool
@@ -180,67 +184,14 @@ void
 edge
 ::push_datum(edge_datum_t const& datum)
 {
-  {
-    priv::shared_lock_t const lock(d->complete_mutex);
-
-    (void)lock;
-
-    if (d->downstream_complete)
-    {
-      return;
-    }
-  }
-
-  {
-    priv::upgrade_lock_t lock(d->mutex);
-
-    while (d->full_of_data())
-    {
-      d->cond_have_space.wait(lock);
-    }
-
-    {
-      priv::upgrade_to_unique_lock_t const write_lock(lock);
-
-      (void)write_lock;
-
-      d->q.push_back(datum);
-    }
-  }
-
-  d->cond_have_data.notify_one();
+  d->push(datum);
 }
 
 edge_datum_t
 edge
 ::get_datum()
 {
-  d->complete_check();
-
-  edge_datum_t dat;
-
-  {
-    priv::upgrade_lock_t lock(d->mutex);
-
-    while (!d->has_data())
-    {
-      d->cond_have_data.wait(lock);
-    }
-
-    dat = d->q.front();
-
-    {
-      priv::upgrade_to_unique_lock_t const write_lock(lock);
-
-      (void)write_lock;
-
-      d->q.pop_front();
-    }
-  }
-
-  d->cond_have_space.notify_one();
-
-  return dat;
+  return *d->pop();
 }
 
 edge_datum_t
@@ -251,10 +202,8 @@ edge
 
   priv::shared_lock_t lock(d->mutex);
 
-  while (d->q.size() <= idx)
-  {
-    d->cond_have_data.wait(lock);
-  }
+  d->cond_have_data.wait(lock,
+      boost::bind(&priv::edge_queue_t::size, &d->q) > idx);
 
   return d->q.at(idx);
 }
@@ -268,10 +217,8 @@ edge
   {
     priv::upgrade_lock_t lock(d->mutex);
 
-    while (!d->has_data())
-    {
-      d->cond_have_data.wait(lock);
-    }
+    d->cond_have_data.wait(lock,
+        !boost::bind(&priv::edge_queue_t::empty, &d->q));
 
     {
       priv::upgrade_to_unique_lock_t const write_lock(lock);
@@ -283,6 +230,20 @@ edge
   }
 
   d->cond_have_space.notify_one();
+}
+
+bool
+edge
+::try_push_datum(edge_datum_t const& datum, duration_t const& duration)
+{
+  return d->push(datum, duration);
+}
+
+boost::optional<edge_datum_t>
+edge
+::try_get_datum(duration_t const& duration)
+{
+  return d->pop(duration);
 }
 
 void
@@ -376,13 +337,6 @@ edge::priv
 
 bool
 edge::priv
-::has_data() const
-{
-  return !q.empty();
-}
-
-bool
-edge::priv
 ::full_of_data() const
 {
   if (!capacity)
@@ -405,6 +359,91 @@ edge::priv
   {
     throw datum_requested_after_complete();
   }
+}
+
+bool
+edge::priv
+::push(edge_datum_t const& datum, boost::optional<duration_t> const& duration)
+{
+  {
+    shared_lock_t const lock(complete_mutex);
+
+    (void)lock;
+
+    if (downstream_complete)
+    {
+      return true;
+    }
+  }
+
+  {
+    upgrade_lock_t lock(mutex);
+    boost::function<bool ()> const predicate = !boost::bind(&sprokit::edge::priv::full_of_data, this);
+
+    if (duration)
+    {
+      if (!cond_have_space.wait_for(lock, *duration, predicate))
+      {
+        return false;
+      }
+    }
+    else
+    {
+      cond_have_space.wait(lock, predicate);
+    }
+
+    {
+      upgrade_to_unique_lock_t const write_lock(lock);
+
+      (void)write_lock;
+
+      q.push_back(datum);
+    }
+  }
+
+  cond_have_data.notify_one();
+
+  return true;
+}
+
+boost::optional<edge_datum_t>
+edge::priv
+::pop(boost::optional<duration_t> const& duration)
+{
+  complete_check();
+
+  edge_datum_t dat;
+
+  {
+    upgrade_lock_t lock(mutex);
+    boost::function<bool ()> const predicate = !boost::bind(&edge_queue_t::empty, &q);
+
+    if (duration)
+    {
+      if (!cond_have_data.wait_for(lock, *duration, predicate))
+      {
+        return boost::none;
+      }
+    }
+    else
+    {
+      cond_have_data.wait(lock, predicate);
+    }
+
+    dat = q.front();
+
+    {
+      upgrade_to_unique_lock_t const write_lock(lock);
+
+      (void)write_lock;
+
+      q.pop_front();
+    }
+  }
+
+  cond_have_space.notify_one();
+
+  return dat;
 }
 
 }

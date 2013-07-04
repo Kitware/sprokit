@@ -36,8 +36,10 @@
 #include "config.h"
 #include "types.h"
 
+#include <boost/chrono/system_clocks.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/operators.hpp>
+#include <boost/optional.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <vector>
@@ -233,6 +235,29 @@ class SPROKIT_PIPELINE_EXPORT edge
      * \endpostconds
      */
     void pop_datum();
+
+    typedef boost::chrono::high_resolution_clock clock_t;
+    typedef clock_t::duration duration_t;
+
+    /**
+     * \brief Push a datum into the edge.
+     *
+     * \see push_datum
+     *
+     * \param datum The datum to put into the edge.
+     * \param duration The maximum amount of time to wait.
+     */
+    bool try_push_datum(edge_datum_t const& datum, duration_t const& duration);
+    /**
+     * \brief Extract a datum from the edge or fail if a timeout is reached.
+     *
+     * \see get_datum
+     *
+     * \param duration The maximum amount of time to wait.
+     *
+     * \returns The next datum available from the edge, or \c boost::none if the timeout was reached.
+     */
+    boost::optional<edge_datum_t> try_get_datum(duration_t const& duration);
 
     /**
      * \brief Trigger the edge to flush all data and not accept any more data.
