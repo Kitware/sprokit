@@ -395,6 +395,17 @@ IMPLEMENT_TEST(get_data_from_complete)
                    "popping data from a complete edge");
 }
 
+namespace
+{
+
+// This clock is used because it is both steady (which rules out system_clock)
+// and uses the wall time (which rules out thread_clock).
+typedef boost::chrono::process_real_cpu_clock time_clock_t;
+typedef time_clock_t::time_point time_point_t;
+typedef time_clock_t::duration duration_t;
+
+}
+
 #define SECONDS_TO_WAIT 1
 #define WAIT_DURATION boost::chrono::seconds(SECONDS_TO_WAIT)
 
@@ -452,15 +463,11 @@ IMPLEMENT_TEST(capacity)
   }
 }
 
+static void check_time(duration_t const& actual, duration_t const& expected, char const* const message);
+
 void
 push_datum(sprokit::edge_t edge, sprokit::edge_datum_t edat)
 {
-  // This clock is used because it is both steady (which rules out system_clock)
-  // and uses the wall time (which rules out thread_clock).
-  typedef boost::chrono::process_real_cpu_clock time_clock_t;
-  typedef time_clock_t::time_point time_point_t;
-  typedef time_clock_t::duration duration_t;
-
   time_point_t const start = time_clock_t::now();
 
   // This should be blocking.
@@ -470,20 +477,27 @@ push_datum(sprokit::edge_t edge, sprokit::edge_datum_t edat)
 
   duration_t const duration = end - start;
 
-  static double const tolerance = 0.75;
-
-  if (duration < (tolerance * WAIT_DURATION))
-  {
-    TEST_ERROR("It seems as though blocking did not "
-               "occur when pushing into a full edge: "
-               "expected to wait between "
-               << tolerance * WAIT_DURATION << " and "
-               << WAIT_DURATION << ", but waited for "
-               << duration << " instead");
-  }
+  check_time(duration, WAIT_DURATION, "pushing into a full edge");
 
   if (edge->datum_count() != 1)
   {
     TEST_ERROR("A datum was pushed into a full edge");
+  }
+}
+
+void
+check_time(duration_t const& actual, duration_t const& expected, char const* const message)
+{
+  static double const tolerance = 0.75;
+  boost::chrono::duration<double> const allowed = tolerance * WAIT_DURATION;
+
+  if (actual < allowed)
+  {
+    TEST_ERROR("It seems as though blocking did not "
+               "occur when " << message << ": "
+               "expected to wait between "
+               << allowed << " and "
+               << expected << ", but waited for "
+               << actual << " instead");
   }
 }
