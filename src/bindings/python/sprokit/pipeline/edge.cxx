@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2011-2012 by Kitware, Inc.
+ * Copyright 2011-2013 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,10 @@
 #include <sprokit/pipeline/edge.h>
 #include <sprokit/pipeline/stamp.h>
 
+#include <sprokit/python/util/python_convert_optional.h>
 #include <sprokit/python/util/python_gil.h>
 
+#include <boost/chrono/duration.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/module.hpp>
@@ -45,6 +47,9 @@
  */
 
 using namespace boost::python;
+
+static bool edge_try_push_datum(sprokit::edge_t const& self, sprokit::edge_datum_t const& datum, double duration);
+static boost::optional<sprokit::edge_datum_t> edge_try_get_datum(sprokit::edge_t const& self, double duration);
 
 BOOST_PYTHON_MODULE(edge)
 {
@@ -63,6 +68,8 @@ BOOST_PYTHON_MODULE(edge)
     , "A collection of edges.")
     .def(vector_indexing_suite<sprokit::edges_t>())
   ;
+
+  sprokit::python::register_optional_converter<sprokit::edge_datum_t>("EdgeDatumOpt", "An optional edge datum.");
 
   class_<sprokit::edge, sprokit::edge_t, boost::noncopyable>("Edge"
     , "A communication channel between processes."
@@ -87,6 +94,12 @@ BOOST_PYTHON_MODULE(edge)
       , "Returns the next datum packet from the edge.")
     .def("pop_datum", &sprokit::edge::pop_datum
       , "Remove the next datum packet from the edge.")
+    .def("try_push_datum", &edge_try_push_datum
+      , (arg("datum"), arg("duration"))
+      , "Pushes a datum packet into the edge and returns True or returns False if unable to meet the duration.")
+    .def("try_get_datum", &edge_try_get_datum
+      , (arg("duration"))
+      , "Returns the next datum packet from the edge, removing it in the process or None if unable to meet the duration.")
     .def("set_upstream_process", &sprokit::edge::set_upstream_process
       , (arg("process"))
       , "Set the process which is feeding data into the edge.")
@@ -100,4 +113,29 @@ BOOST_PYTHON_MODULE(edge)
     .def_readonly("config_dependency", &sprokit::edge::config_dependency)
     .def_readonly("config_capacity", &sprokit::edge::config_capacity)
   ;
+}
+
+namespace
+{
+
+typedef boost::chrono::duration<double> py_duration_t;
+
+}
+
+bool
+edge_try_push_datum(sprokit::edge_t const& self, sprokit::edge_datum_t const& datum, double duration)
+{
+  py_duration_t const duration_sec = py_duration_t(duration);
+  sprokit::edge::duration_t const duration_edge = boost::chrono::duration_cast<sprokit::edge::duration_t>(duration_sec);
+
+  return self->try_push_datum(datum, duration_edge);
+}
+
+boost::optional<sprokit::edge_datum_t>
+edge_try_get_datum(sprokit::edge_t const& self, double duration)
+{
+  py_duration_t const duration_sec = py_duration_t(duration);
+  sprokit::edge::duration_t const duration_edge = boost::chrono::duration_cast<sprokit::edge::duration_t>(duration_sec);
+
+  return self->try_get_datum(duration_edge);
 }
