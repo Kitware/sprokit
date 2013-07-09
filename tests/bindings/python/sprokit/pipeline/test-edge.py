@@ -60,6 +60,7 @@ def test_datum_create():
     edge.EdgeData()
 
 
+# TEST_PROPERTY(TIMEOUT, 5)
 def test_api_calls():
     from sprokit.pipeline import config
     from sprokit.pipeline import datum
@@ -87,6 +88,17 @@ def test_api_calls():
     e.push_datum(ed)
     e.peek_datum()
     e.pop_datum()
+
+    wait = 1
+    fail = e.try_get_datum(wait)
+    e.try_push_datum(ed, wait)
+    succeed = e.try_get_datum(wait)
+
+    if fail is not None:
+        test_error("Received a datum when that should have timed out")
+
+    if succeed is None:
+        test_error("Did not receive a datum from a get that should have succeeded")
 
     modules.load_known_modules()
 
