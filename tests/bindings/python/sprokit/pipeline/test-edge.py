@@ -87,6 +87,9 @@ def test_api_calls():
 
     e.push_datum(ed)
     e.peek_datum()
+    e.push_datum(ed)
+    e.peek_datum(1)
+    e.pop_datum()
     e.pop_datum()
 
     wait = 1
