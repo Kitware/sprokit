@@ -75,8 +75,22 @@ bool
 edge_datum_t
 ::operator == (edge_datum_t const& rhs) const
 {
-  return (( datum ==  rhs.datum) &&
-          (*stamp == *rhs.stamp));
+  if (datum != rhs.datum)
+  {
+    return false;
+  }
+
+  if (stamp == stamp)
+  {
+    return true;
+  }
+
+  if (!stamp || !datum)
+  {
+    return false;
+  }
+
+  return (*stamp == *rhs.stamp);
 }
 
 config::key_t const edge::config_dependency = config::key_t("_dependency");
