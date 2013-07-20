@@ -1,0 +1,5 @@
+config sysinfo
+  :homedir[ro]{SYS} homedir
+  :curdir[ro]{SYS} curdir
+  :processors[ro]{SYS} processors
+  :pid[ro]{SYS} pid
