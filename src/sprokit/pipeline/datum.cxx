@@ -89,6 +89,46 @@ datum
   return m_error;
 }
 
+static bool any_equal(boost::any const& a, boost::any const& b);
+
+bool
+datum
+::operator == (datum const& dat) const
+{
+  if (this == &dat)
+  {
+    return true;
+  }
+
+  if (m_type != dat.m_type)
+  {
+    return false;
+  }
+
+  bool ret = false;
+
+  switch (m_type)
+  {
+    case data:
+      ret = any_equal(m_datum, dat.m_datum);
+      break;
+    case empty:
+    case flush:
+    case complete:
+      ret = true;
+      break;
+    case error:
+      ret = (m_error == dat.m_error);
+      break;
+    case invalid:
+    default:
+      ret = false;
+      break;
+  }
+
+  return ret;
+}
+
 datum
 ::datum(type_t ty)
   : m_type(ty)
@@ -165,6 +205,23 @@ bad_datum_cast_exception
 bad_datum_cast_exception
 ::~bad_datum_cast_exception() SPROKIT_NOTHROW
 {
+}
+
+bool
+any_equal(boost::any const& a, boost::any const& b)
+{
+  if (a.empty() && b.empty())
+  {
+    return true;
+  }
+
+  if (a.type() != b.type())
+  {
+    return false;
+  }
+
+  // Be safe.
+  return false;
 }
 
 char const*
