@@ -71,26 +71,15 @@ edge_datum_t
 {
 }
 
+template <typename T>
+static bool pointers_equal(T const& a, T const& b);
+
 bool
 edge_datum_t
 ::operator == (edge_datum_t const& rhs) const
 {
-  if (datum != rhs.datum)
-  {
-    return false;
-  }
-
-  if (stamp == stamp)
-  {
-    return true;
-  }
-
-  if (!stamp || !datum)
-  {
-    return false;
-  }
-
-  return (*stamp == *rhs.stamp);
+  return (pointers_equal(datum, rhs.datum) &&
+          pointers_equal(stamp, rhs.stamp));
 }
 
 config::key_t const edge::config_dependency = config::key_t("_dependency");
@@ -458,6 +447,23 @@ edge::priv
   cond_have_space.notify_one();
 
   return dat;
+}
+
+template <typename T>
+bool
+pointers_equal(T const& a, T const& b)
+{
+  if (a == b)
+  {
+    return true;
+  }
+
+  if (!a || !b)
+  {
+    return false;
+  }
+
+  return (*a == *b);
 }
 
 }
