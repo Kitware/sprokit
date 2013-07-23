@@ -141,11 +141,11 @@ datum_get_error(sprokit::datum_t const& self)
 object
 datum_get_datum(sprokit::datum_t const& self)
 {
+  boost::any const any = self->get_datum<boost::any>();
+
   sprokit::python::python_gil const gil;
 
   (void)gil;
-
-  boost::any const any = self->get_datum<boost::any>();
 
   return object(any);
 }
