@@ -535,6 +535,15 @@ IMPLEMENT_TEST(config_provider_sys)
   /// \todo Test values.
 }
 
+IMPLEMENT_TEST(config_provider_sys_unrecognized)
+{
+  sprokit::pipe_blocks const blocks = sprokit::load_pipe_blocks_from_file(pipe_file);
+
+  EXPECT_EXCEPTION(sprokit::unrecognized_system_index_exception,
+                   sprokit::extract_configuration(blocks),
+                   "using an unrecognized SYS provider key");
+}
+
 IMPLEMENT_TEST(config_provider_unprovided)
 {
   sprokit::pipe_blocks const blocks = sprokit::load_pipe_blocks_from_file(pipe_file);
