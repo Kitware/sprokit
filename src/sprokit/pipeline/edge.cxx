@@ -347,7 +347,7 @@ edge::priv
     return false;
   }
 
-  return (q.size() == capacity);
+  return (capacity <= q.size());
 }
 
 void
