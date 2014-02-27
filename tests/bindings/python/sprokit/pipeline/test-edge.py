@@ -92,6 +92,8 @@ def test_api_calls():
     e.pop_datum()
     e.pop_datum()
 
+    ed == ed
+
     wait = 1
     fail = e.try_get_datum(wait)
     e.try_push_datum(ed, wait)

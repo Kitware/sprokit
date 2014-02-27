@@ -63,6 +63,72 @@ main(int argc, char* argv[])
   RUN_TEST(testname);
 }
 
+IMPLEMENT_TEST(edge_datum_equal)
+{
+  sprokit::edge_datum_t edat1 = sprokit::edge_datum_t();
+  sprokit::edge_datum_t edat2 = sprokit::edge_datum_t();
+
+  if (edat1 != edat2)
+  {
+    TEST_ERROR("Empty edge data are not equivalent");
+  }
+
+  edat1.stamp = sprokit::stamp::new_stamp(1);
+  edat2.stamp = sprokit::stamp::new_stamp(1);
+
+  if (edat1 != edat2)
+  {
+    TEST_ERROR("Edge data with just a new stamp are not equivalent");
+  }
+
+  edat1.stamp = sprokit::stamp_t();
+  edat2.stamp = sprokit::stamp_t();
+
+  sprokit::datum_t const dat = sprokit::datum::complete_datum();
+
+  edat1.datum = dat;
+  edat2.datum = dat;
+
+  if (edat1 != edat2)
+  {
+    TEST_ERROR("Edge data with just the same datum are not equivalent");
+  }
+
+  edat1.stamp = sprokit::stamp_t();
+  edat2.stamp = sprokit::stamp_t();
+
+  if (edat1 != edat2)
+  {
+    TEST_ERROR("Edge data with just the same datum and new stamps are not equivalent");
+  }
+
+  edat1.stamp = sprokit::stamp::new_stamp(1);
+  edat1.stamp = sprokit::stamp::incremented_stamp(edat1.stamp);
+
+  if (edat1 == edat2)
+  {
+    TEST_ERROR("Edge data with the same datum, but different stamps are equivalent");
+  }
+
+  edat1.stamp = sprokit::stamp::new_stamp(1);
+
+  sprokit::datum_t const dat2 = sprokit::datum::complete_datum();
+
+  edat1.datum = dat2;
+
+  if (edat1 == edat2)
+  {
+    TEST_ERROR("Edge data with the same stamp, but different data (of the same type) are equivalent");
+  }
+
+  edat1.stamp = sprokit::stamp::incremented_stamp(edat1.stamp);
+
+  if (edat1 == edat2)
+  {
+    TEST_ERROR("Edge data with different stamps and data are equivalent");
+  }
+}
+
 IMPLEMENT_TEST(null_config)
 {
   sprokit::config_t const config;

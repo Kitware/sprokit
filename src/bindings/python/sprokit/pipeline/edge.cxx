@@ -48,6 +48,7 @@
 
 using namespace boost::python;
 
+static bool edge_datum_eq(sprokit::edge_datum_t const& self, sprokit::edge_datum_t const& rhs);
 static bool edge_try_push_datum(sprokit::edge_t const& self, sprokit::edge_datum_t const& datum, double duration);
 static boost::optional<sprokit::edge_datum_t> edge_try_get_datum(sprokit::edge_t const& self, double duration);
 
@@ -57,6 +58,7 @@ BOOST_PYTHON_MODULE(edge)
     , no_init)
     .def(init<>())
     .def(init<sprokit::datum_t, sprokit::stamp_t>())
+    .def("__eq__", &edge_datum_eq)
     .def_readwrite("datum", &sprokit::edge_datum_t::datum)
     .def_readwrite("stamp", &sprokit::edge_datum_t::stamp)
   ;
@@ -113,6 +115,12 @@ BOOST_PYTHON_MODULE(edge)
     .def_readonly("config_dependency", &sprokit::edge::config_dependency)
     .def_readonly("config_capacity", &sprokit::edge::config_capacity)
   ;
+}
+
+bool
+edge_datum_eq(sprokit::edge_datum_t const& self, sprokit::edge_datum_t const& rhs)
+{
+  return (self == rhs);
 }
 
 namespace
