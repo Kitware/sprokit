@@ -149,9 +149,9 @@ function (sprokit_add_tooled_run_test group instance)
       endif ()
     endif ()
 
-    sprokit_add_tooled_test(${group} ${instance}-${scheduler})
+    sprokit_add_tooled_test("${group}" "${instance}-${scheduler}")
 
-    set_tests_properties(test-${group}-${instance}-${scheduler}
+    set_tests_properties("test-${group}-${instance}-${scheduler}"
       PROPERTIES
         TIMEOUT 5)
 
