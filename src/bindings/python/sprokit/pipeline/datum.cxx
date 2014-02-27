@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2011-2012 by Kitware, Inc.
+ * Copyright 2011-2013 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,6 +59,7 @@ static sprokit::datum_t new_datum(object const& obj);
 static sprokit::datum::type_t datum_type(sprokit::datum_t const& self);
 static sprokit::datum::error_t datum_get_error(sprokit::datum_t const& self);
 static object datum_get_datum(sprokit::datum_t const& self);
+static bool datum_eq(sprokit::datum_t const& self, sprokit::datum_t const& other);
 
 BOOST_PYTHON_MODULE(datum)
 {
@@ -97,6 +98,7 @@ BOOST_PYTHON_MODULE(datum)
       , "The error contained within the datum packet.")
     .def("get_datum", &datum_get_datum
       , "Get the data contained within the packet.")
+    .def("__eq__", &datum_eq)
   ;
 
   sprokit::python::register_type<std::string>(0);
@@ -146,4 +148,10 @@ datum_get_datum(sprokit::datum_t const& self)
   boost::any const any = self->get_datum<boost::any>();
 
   return object(any);
+}
+
+bool
+datum_eq(sprokit::datum_t const& self, sprokit::datum_t const& other)
+{
+  return (*self == *other);
 }
