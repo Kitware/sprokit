@@ -121,18 +121,27 @@ function (_sprokit_export name)
     EXPORT ${export_name}
     PARENT_SCOPE)
 
-  set_property(GLOBAL APPEND
-    PROPERTY sprokit_export_targets
-    "${name}")
+  if (CMAKE_VERSION VERSION_LESS 3.0)
+    set_property(GLOBAL APPEND
+      PROPERTY sprokit_export_targets
+      "${name}")
+  endif ()
 endfunction ()
 
-function (sprokit_export_targets file)
-  get_property(sprokit_exports GLOBAL
-    PROPERTY sprokit_export_targets)
-  export(
-    TARGETS ${sprokit_exports}
-    ${ARGN}
-    FILE    "${file}")
+function (sprokit_export_targets file export_name)
+  if (CMAKE_VERSION VERSION_LESS 3.0)
+    get_property(sprokit_exports GLOBAL
+      PROPERTY sprokit_export_targets)
+    export(
+      TARGETS ${sprokit_exports}
+      ${ARGN}
+      FILE    "${file}")
+  else ()
+    export(
+      EXPORT "${export_name}"
+      ${ARGN}
+      FILE    "${file}")
+  endif ()
 endfunction ()
 
 function (sprokit_install)

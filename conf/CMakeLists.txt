@@ -129,7 +129,7 @@ sprokit_install(
   DESTINATION "${cmakedir}"
   COMPONENT   development
   RENAME      sprokit-config-variables.cmake)
-sprokit_export_targets("${sprokit_binary_dir}/sprokit-config-targets.cmake")
+sprokit_export_targets("${sprokit_binary_dir}/sprokit-config-targets.cmake" "${export_name}")
 sprokit_install(
   EXPORT      "${export_name}"
   DESTINATION "${cmakedir}"
