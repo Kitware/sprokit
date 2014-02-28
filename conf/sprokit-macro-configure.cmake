@@ -28,7 +28,7 @@
 
 add_custom_target(configure ALL)
 
-function (_sprokit_configure_file name source dest)
+function (_sprokit_configure_file source dest)
   file(WRITE "${configure_script}"
     "# Configure script for \"${source}\" -> \"${dest}\"\n")
 
@@ -76,7 +76,7 @@ function (sprokit_configure_file name source dest)
   set(configured_path
     "${configure_script}.output")
 
-  _sprokit_configure_file(${name} "${source}" "${dest}" ${ARGN})
+  _sprokit_configure_file("${source}" "${dest}" ${ARGN})
 
   add_custom_command(
     OUTPUT  "${dest}"
