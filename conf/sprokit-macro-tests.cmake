@@ -55,18 +55,18 @@ function (sprokit_declare_test name)
 endfunction ()
 
 function (sprokit_build_test name libraries)
-  add_executable(test-${name} ${ARGN})
-  set_target_properties(test-${name}
+  add_executable("test-${name}" ${ARGN})
+  set_target_properties("test-${name}"
     PROPERTIES
       RUNTIME_OUTPUT_DIRECTORY "${sprokit_test_output_path}")
-  target_link_libraries(test-${name}
+  target_link_libraries("test-${name}"
     LINK_PRIVATE
       ${${libraries}})
-  sprokit_declare_test(${name})
+  sprokit_declare_test("${name}")
 endfunction ()
 
 function (sprokit_add_test name instance)
-  if (TARGET test-${name})
+  if (TARGET "test-${name}")
     set(test_path "$<TARGET_FILE:test-${name}>")
   elseif (CMAKE_CONFIGURATION_TYPES)
     set(test_path "${sprokit_test_output_path}/$<CONFIGURATION>/test-${name}")
@@ -75,35 +75,35 @@ function (sprokit_add_test name instance)
   endif ()
 
   add_test(
-    NAME    test-${name}-${instance}
+    NAME    "test-${name}-${instance}"
     COMMAND ${sprokit_test_runner}
             "${test_path}"
             ${instance}
             ${ARGN})
-  set_tests_properties(test-${name}-${instance}
+  set_tests_properties("test-${name}-${instance}"
     PROPERTIES
       FAIL_REGULAR_EXPRESSION "^Error: ;\nError: ")
   if (sprokit_test_working_path)
-    set_tests_properties(test-${name}-${instance}
+    set_tests_properties("test-${name}-${instance}"
       PROPERTIES
         WORKING_DIRECTORY       "${sprokit_test_working_path}")
   endif ()
 
   # TODO: How to get CTest the full path to the test with config subdir?
   if (NOT CMAKE_CONFIGURATION_TYPES)
-    set_tests_properties(test-${name}-${instance}
+    set_tests_properties("test-${name}-${instance}"
       PROPERTIES
       REQUIRED_FILES "${sprokit_test_output_path}/${CMAKE_CFG_INTDIR}/test-${name}")
   endif ()
   if (sprokit_test_environment)
-    set_tests_properties(test-${name}-${instance}
+    set_tests_properties("test-${name}-${instance}"
       PROPERTIES
         ENVIRONMENT "${sprokit_test_environment}")
   endif ()
   if (SPROKIT_TEST_ADD_TARGETS)
-    add_custom_target(test-${name}-${instance})
+    add_custom_target("test-${name}-${instance}")
     add_custom_command(
-      TARGET  test-${name}-${instance}
+      TARGET  "test-${name}-${instance}"
       COMMAND ${sprokit_test_environment}
               ${sprokit_test_runner}
               "${sprokit_test_output_path}/${CMAKE_CFG_INTDIR}/test-${name}"
@@ -112,7 +112,7 @@ function (sprokit_add_test name instance)
       WORKING_DIRECTORY
               "${sprokit_test_working_path}"
       COMMENT "Running test \"${name}\" instance \"${instance}\"")
-    add_dependencies(tests-${name}
-      test-${name}-${instance})
+    add_dependencies("tests-${name}"
+      "test-${name}-${instance}")
   endif ()
 endfunction ()

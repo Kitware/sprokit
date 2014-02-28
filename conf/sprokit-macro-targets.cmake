@@ -99,11 +99,11 @@ define_property(GLOBAL
 
 function (_sprokit_compile_pic name)
   if (CMAKE_VERSION VERSION_GREATER "2.8.9")
-    set_target_properties(${name}
+    set_target_properties("${name}"
       PROPERTIES
         POSITION_INDEPENDENT_CODE TRUE)
   elseif (NOT MSVC)
-    set_target_properties(${name}
+    set_target_properties("${name}"
       PROPERTIES
         COMPILE_FLAGS "-fPIC")
   endif ()
@@ -123,7 +123,7 @@ function (_sprokit_export name)
 
   set_property(GLOBAL APPEND
     PROPERTY sprokit_export_targets
-    ${name})
+    "${name}")
 endfunction ()
 
 function (sprokit_export_targets file)
@@ -144,9 +144,9 @@ function (sprokit_install)
 endfunction ()
 
 function (sprokit_add_executable name)
-  add_executable(${name}
+  add_executable("${name}"
     ${ARGN})
-  set_target_properties(${name}
+  set_target_properties("${name}"
     PROPERTIES
       RUNTIME_OUTPUT_DIRECTORY "${sprokit_output_dir}/bin")
 
@@ -155,10 +155,10 @@ function (sprokit_add_executable name)
       runtime)
   endif ()
 
-  _sprokit_export(${name})
+  _sprokit_export("${name}")
 
   sprokit_install(
-    TARGETS     ${name}
+    TARGETS     "${name}"
     ${exports}
     DESTINATION bin
     COMPONENT   ${component})
@@ -218,14 +218,14 @@ function (sprokit_add_library name)
 endfunction ()
 
 function (sprokit_add_plugin name define)
-  set(library_subdir /sprokit)
+  set(library_subdir "/sprokit")
 
   set(no_export ON)
 
-  sprokit_add_library(${name} MODULE
+  sprokit_add_library("${name}" MODULE
     ${ARGN})
 
-  set_target_properties(${name}
+  set_target_properties("${name}"
     PROPERTIES
       DEFINE_SYMBOL    ${define}
       PREFIX           ""
@@ -271,11 +271,11 @@ function (sprokit_install_includes)
 endfunction ()
 
 function (sprokit_add_helper_library name sources)
-  add_library(${name} STATIC
+  add_library("${name}" STATIC
     ${${sources}})
-  target_link_libraries(${name}
+  target_link_libraries("${name}"
     LINK_PRIVATE
       ${ARGN})
 
-  _sprokit_compile_pic(${name})
+  _sprokit_compile_pic("${name}")
 endfunction ()
