@@ -102,10 +102,23 @@ if (SPROKIT_ENABLE_CLANG_CATCH_UNDEFINED_BEHAVIOR)
   sprokit_want_compiler_flag(-fcatch-undefined-behavior)
 endif ()
 
-option(SPROKIT_ENABLE_ASAN "Enable address sanitization" OFF)
+cmake_dependent_option(SPROKIT_ENABLE_ASAN "Enable address sanitization" OFF
+  "NOT SPROKIT_ENABLE_TSAN" OFF)
+cmake_dependent_option(SPROKIT_ENABLE_TSAN "Enable thread sanitization" OFF
+  "NOT SPROKIT_ENABLE_ASAN" OFF)
+option(SPROKIT_ENABLE_UBSAN "Enable undefined behavior sanitization" OFF)
+
 if (SPROKIT_ENABLE_ASAN)
-  sprokit_check_compiler_flag(sprokit_warnings -fsanitize=address)
-  sprokit_check_compiler_flag(sprokit_warnings -fno-omit-frame-pointer)
+  sprokit_want_compiler_flag(-fsanitize=address)
+  sprokit_want_compiler_flag(-fno-omit-frame-pointer)
+endif ()
+
+if (SPROKIT_ENABLE_TSAN)
+  sprokit_want_compiler_flag(-fsanitize=thread)
+endif ()
+
+if (SPROKIT_ENABLE_UBSAN)
+  sprokit_want_compiler_flag(-fsanitize=undefined)
 endif ()
 
 option(SPROKIT_ENABLE_COVERAGE "Build with coverage testing" OFF)
