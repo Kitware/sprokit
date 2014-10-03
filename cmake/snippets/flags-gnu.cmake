@@ -96,9 +96,8 @@ if (SPROKIT_ENABLE_WERROR)
   sprokit_want_compiler_flag(-Werror)
 endif ()
 
-cmake_dependent_option(SPROKIT_ENABLE_CLANG_CATCH_UNDEFINED_BEHAVIOR "Use clang to flag undefined behavior" OFF
-  sprokit_using_clang OFF)
-if (SPROKIT_ENABLE_CLANG_CATCH_UNDEFINED_BEHAVIOR)
+option(SPROKIT_ENABLE_CATCH_UNDEFINED_BEHAVIOR "Flag undefined behavior" OFF)
+if (SPROKIT_ENABLE_CATCH_UNDEFINED_BEHAVIOR)
   sprokit_want_compiler_flag(-fcatch-undefined-behavior)
 endif ()
 
