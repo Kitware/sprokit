@@ -39,7 +39,9 @@ set(CTEST_BUILD_NAME_BASE "@CDASH_BUILD_NAME@")
 set(SPROKIT_ENABLE_COVERAGE "@SPROKIT_ENABLE_COVERAGE@")
 
 set(CTEST_COVERAGE_COMMAND "@GCOV_EXECUTABLE@")
-set(CTEST_MEMORYCHECK_COMMAND "@VALGRIND_EXECUTABLE@")
+set(CTEST_MEMORYCHECK_TYPE "@MEMORYCHECK_TYPE@")
+set(CTEST_MEMORYCHECK_SANITIZER_OPTIONS "@MEMORYCHECK_SANITIZER_OPTIONS@")
+set(CTEST_VALGRIND_COMMAND "@VALGRIND_EXECUTABLE@")
 
 ###############################################################################
 
@@ -178,28 +180,31 @@ ctest_configure()
 ctest_build()
 ctest_test()
 
-if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
-  set(valgrind_arguments)
+if (WITH_MEMCHECK)
+  if (CTEST_MEMORYCHECK_TYPE STREQUAL "Valgrind" AND CTEST_VALGRIND_COMMAND)
+    set(valgrind_arguments)
 
-  list(APPEND valgrind_arguments
-    "--quiet")
-  list(APPEND valgrind_arguments
-    "--leak-check=yes")
-  list(APPEND valgrind_arguments
-    "--show-reachable=yes")
-  list(APPEND valgrind_arguments
-    "--num-callers=50")
-
-  file(GLOB valgrind_suppressions
-    "${CTEST_SOURCE_DIRECTORY}/tests/data/valgrind/*.supp")
-
-  foreach (valgrind_suppression IN LISTS valgrind_suppressions)
     list(APPEND valgrind_arguments
-      "--suppressions=${valgrind_suppression}")
-  endforeach ()
+      "--quiet")
+    list(APPEND valgrind_arguments
+      "--leak-check=yes")
+    list(APPEND valgrind_arguments
+      "--show-reachable=yes")
+    list(APPEND valgrind_arguments
+      "--num-callers=50")
 
-  set(CTEST_MEMORYCHECK_COMMAND_OPTIONS
-    "${valgrind_arguments}")
+    file(GLOB valgrind_suppressions
+      "${CTEST_SOURCE_DIRECTORY}/tests/data/valgrind/*.supp")
+
+    foreach (valgrind_suppression IN LISTS valgrind_suppressions)
+      list(APPEND valgrind_arguments
+        "--suppressions=${valgrind_suppression}")
+    endforeach ()
+
+    set(CTEST_MEMORYCHECK_COMMAND "${CTEST_VALGRIND_COMMAND}")
+    set(CTEST_MEMORYCHECK_COMMAND_OPTIONS
+      "${valgrind_arguments}")
+  endif ()
 
   ctest_memcheck()
 endif ()
