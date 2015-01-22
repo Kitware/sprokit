@@ -123,6 +123,16 @@ def test_error_():
         test_error("An error datum does not have None as its data")
 
 
+def test_compare():
+    from sprokit.pipeline import datum
+
+    d1 = datum.complete()
+    d2 = datum.complete()
+
+    if not d1 == d2:
+        test_error("A complete datum is not equal to a complete datum")
+
+
 if __name__ == '__main__':
     import os
     import sys

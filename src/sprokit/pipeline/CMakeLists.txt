@@ -153,11 +153,12 @@ sprokit_add_library(sprokit_pipeline SHARED
   ${pipeline_headers}
   ${pipeline_private_headers})
 target_link_libraries(sprokit_pipeline
-  LINK_PRIVATE
+  LINK_PUBLIC
     ${Boost_CHRONO_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+  LINK_PRIVATE
     ${Boost_DATE_TIME_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${CMAKE_DL_LIBS}
     ${CMAKE_THREAD_LIBS_INIT})
