@@ -18,6 +18,29 @@ function (_sprokit_declare_tool_group tool)
     ${tool})
 endfunction ()
 
+foreach (sanitizer ASAN TSAN UBSAN)
+  set("SPROKIT_SANITIZER_OPTIONS_${sanitizer}" ""
+    CACHE STRING "Options to set for ${sanitizer}")
+  mark_as_advanced("SPROKIT_SANITIZER_OPTIONS_${sanitizer}")
+endforeach ()
+
+set(memcheck_type "Valgrind")
+set(sanitizer_options "")
+if (SPROKIT_ENABLE_ASAN)
+  set(memcheck_type "AddressSanitizer")
+  set(sanitizer_options "${SPROKIT_SANITIZER_OPTIONS_ASAN}")
+elseif (SPROKIT_ENABLE_TSAN)
+  set(memcheck_type "ThreadSanitizer")
+  set(sanitizer_options "${SPROKIT_SANITIZER_OPTIONS_TSAN}")
+elseif (SPROKIT_ENABLE_UBSAN)
+  set(memcheck_type "UndefinedBehaviorSanitizer")
+  set(sanitizer_options "${SPROKIT_SANITIZER_OPTIONS_UBSAN}")
+endif ()
+set(MEMORYCHECK_TYPE "${memcheck_type}"
+  CACHE INTERNAL "Memory tool expected to be used")
+set(MEMORYCHECK_SANITIZER_OPTIONS "${sanitizer_options}"
+  CACHE INTERNAL "Options for the enabled sanitizer")
+
 if (VALGRIND_EXECUTABLE)
   set(sprokit_valgrind_arguments)
 

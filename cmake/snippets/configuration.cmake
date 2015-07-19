@@ -4,6 +4,12 @@
 #  "SPROKIT_CONFIGURATION=\"$<CONFIGURATION>\""
 #  "SPROKIT_CONFIGURATION_L=L\"$<CONFIGURATION>\"")
 
+if (DEFINED CMAKE_BUILD_TYPE)
+  set_property(CACHE CMAKE_BUILD_TYPE
+    PROPERTY
+      STRINGS "Release;Debug;RelWithDebInfo;MinSizeRel")
+endif ()
+
 # XXX(cmake): 2.8.12
 foreach (config IN LISTS CMAKE_CONFIGURATION_TYPES)
   string(TOUPPER "${config}" upper_config)

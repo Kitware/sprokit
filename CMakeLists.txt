@@ -66,6 +66,10 @@ endif ()
 
 option(SPROKIT_ENABLE_TESTING "Build tests" OFF)
 if (SPROKIT_ENABLE_TESTING)
+  include("${sprokit_source_dir}/conf/sprokit-macro-tests.cmake")
+  include("${sprokit_source_dir}/cmake/support/test.cmake")
+  set(CTEST_NEW_FORMAT ON)
+
   include(CTest)
 
   add_subdirectory(tests)
